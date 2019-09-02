@@ -1,10 +1,22 @@
 var birds = [];
 var canvas;
+var asteroids = [];
 
 function setup() {
   angleMode(DEGREES);
   canvas = createCanvas(innerWidth, innerHeight);
   canvas.parent("mainSketch");
+  for (let i = 0; i < 12; i++) {
+    asteroids.push(
+      new Asteroid(
+        random(0, innerWidth),
+        random(0, innerHeight),
+        random(-1, 1),
+        random(-1, 1)
+      )
+    );
+  }
+  // asteroid = new Asteroid(100, 100, random(-1, 1), random(-1, 1));
   // background(0);
   // for (let i = 0; i < 100; i++) {
   //   birds.push(
@@ -17,17 +29,20 @@ function setup() {
   //     )
   //   );
   // }
-  // for (let i = 0; i < 100; i++) {
-  //   birds.push(new Bird(innerWidth / 2, innerHeight / 2, random(0, 360), 5, 1));
-  // }
+  for (let i = 0; i < 100; i++) {
+    birds.push(new Bird(innerWidth / 2, innerHeight / 2, random(0, 360), 5, 1));
+  }
 }
 
 function draw() {
   background(0);
   showDebug();
-  // for (let i = 0; i < birds.length; i++) {
-  //   birds[i].run();
-  // }
+  for (let i = 0; i < birds.length; i++) {
+    birds[i].run();
+  }
+  for (let i = 0; i < asteroids.length; i++) {
+    asteroids[i].run();
+  }
 }
 
 // function drawGradient(x, y, radius) {
@@ -62,11 +77,61 @@ function toRadians(angle) {
 }
 
 class Asteroid {
-  constructor(x, y) {
+  constructor(x, y, vx, vy) {
     this.x = x;
     this.y = y;
-    this.vx = 0;
-    this.vy = 0;
+    this.vx = vx;
+    this.vy = vy;
+    this.points = [];
+    let numberOfPoints = 12; //12 points that asteroid is drawn from
+    this.overallSize = random(1, 5);
+    for (let i = 0; i < numberOfPoints; i++) {
+      let distance = random(
+        10 + this.overallSize * 2,
+        20 + this.overallSize * 4
+      );
+      let angle = random(
+        (360 / numberOfPoints) * i,
+        (360 / numberOfPoints) * (i + 1)
+      );
+      this.points.push({
+        x: distance * Math.cos(toRadians(angle)),
+        y: distance * Math.sin(toRadians(angle))
+      });
+    }
+  }
+
+  run() {
+    this.render();
+    this.move();
+  }
+
+  render() {
+    noFill();
+    stroke(255);
+    beginShape();
+    for (let i = 0; i < this.points.length; i++) {
+      vertex(this.points[i].x + this.x, this.points[i].y + this.y);
+    }
+    vertex(this.points[0].x + this.x, this.points[0].y + this.y);
+    endShape();
+  }
+
+  move() {
+    this.x += this.vx;
+    this.y += this.vy;
+    if (this.x > innerWidth + this.overallSize * 5) {
+      this.x = -(this.overallSize * 5);
+    } else if (this.x < -(this.overallSize * 5)) {
+      this.x = innerWidth + this.overallSize * 5;
+    }
+    if (this.y > innerHeight + this.overallSize * 5) {
+      this.y = -(this.overallSize * 5);
+    } else if (this.y < -(this.overallSize * 5)) {
+      this.y = innerHeight + this.overallSize * 5;
+    }
+    this.vx *= 0.998;
+    this.vy *= 0.998;
   }
 }
 
@@ -86,10 +151,16 @@ class Bird {
   run() {
     this.rotateTowards(this.rotationSpeed, mouseX, mouseY);
     for (let i = 0; i < birds.length; i++) {
-      // this.rotateFrom(this.rotationSpeed, birds[i].x, birds[i].y);
-
-      this.rotateFrom(this.rotationSpeed / 2, birds[i].x, birds[i].y);
-      birds[i].rotateFrom(birds[i].rotationSpeed / 2, this.x, this.y);
+      this.rotateFrom(this.rotationSpeed / 2, 50, birds[i].x, birds[i].y);
+      birds[i].rotateFrom(birds[i].rotationSpeed / 2, 50, this.x, this.y);
+    }
+    for (let i = 0; i < asteroids.length; i++) {
+      let distance = this.rotateFrom(
+        this.rotationSpeed * 4,
+        100,
+        asteroids[i].x,
+        asteroids[i].y
+      );
     }
     this.calcAcceleration(this.speed);
     this.move();
@@ -120,12 +191,12 @@ class Bird {
     translate(-placeholderX, -placeholderY);
   }
 
-  rotateFrom(rateOfChange_, x, y) {
+  rotateFrom(rateOfChange_, distanceOfRepultion_, x, y) {
     //make bird rotate from the point
     let distanceToObject = getDistance(this.x, this.y, x, y);
-    let distanceOfRepultion = 50;
+    let distanceOfRepultion = distanceOfRepultion_;
     if (Math.abs(distanceToObject) > distanceOfRepultion) {
-      return;
+      return distanceToObject;
     } else {
       // if (Math.random() > 0.5) {
       //   this.angle += this.rotationSpeed;
@@ -185,6 +256,7 @@ class Bird {
       if (this.angle > 359) {
         this.angle = this.angle % 360;
       }
+      return distanceToObject;
     }
   }
 
