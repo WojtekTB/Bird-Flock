@@ -1,6 +1,11 @@
 var birds = [];
 var canvas;
 var asteroids = [];
+var titleImage;
+
+function preload() {
+  titleImage = loadImage("./vadim kim website.png");
+}
 
 function setup() {
   angleMode(DEGREES);
@@ -35,7 +40,9 @@ function setup() {
 }
 
 function draw() {
+  resizeCanvas(innerWidth, innerHeight);
   background(0);
+  showTitle();
   showDebug();
   for (let i = 0; i < birds.length; i++) {
     birds[i].run();
@@ -45,16 +52,23 @@ function draw() {
   }
 }
 
-// function drawGradient(x, y, radius) {
-//   for (let r = radius; r > 0; --r) {
-//     let lightnes = map(r, 0, radius, 50, 20);
-//     let c = color(`hsl(0, 0%, ${lightnes}%)`);
-//     fill(c);
-//     // debugger
-//     noStroke();
-//     ellipse(x, y, r, r);
-//   }
-// }
+function showTitle() {
+  let titleScale = 0.5;
+  // image(
+  //   titleImage,
+  //   width / 2 - (titleImage.width * titleScale) / 2,
+  //   height * (2 / 5) - titleImage.height * titleScale,
+  //   titleImage.width * titleScale,
+  //   titleImage.height * titleScale
+  // );
+  image(
+    titleImage,
+    width / 2 - (titleImage.width * titleScale) / 2,
+    height * 0.5 - titleImage.height * titleScale,
+    titleImage.width * titleScale,
+    titleImage.height * titleScale
+  );
+}
 
 function showDebug() {
   fill(255);
