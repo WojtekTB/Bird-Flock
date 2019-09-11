@@ -144,8 +144,6 @@ class Asteroid {
     } else if (this.y < -(this.overallSize * 5)) {
       this.y = innerHeight + this.overallSize * 5;
     }
-    this.vx *= 0.998;
-    this.vy *= 0.998;
   }
 }
 
