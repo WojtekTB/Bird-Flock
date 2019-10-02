@@ -5,7 +5,7 @@
     left: 0px;
     top: 0px;
   }
-  .ResumeBtn {
+  #Resume-Button {
     background-color: Transparent;
     outline-color: transparent;
     border: 2px solid whitesmoke;
@@ -19,9 +19,9 @@
     font-family: "Courier New", Courier, monospace;
     position: fixed;
     left: 50vw;
-    top: 51vh;
+    top: 55vh;
   }
-  .MainBtn {
+  #Project-Button {
     background-color: Transparent;
     outline-color: transparent;
     border: 2px solid whitesmoke;
@@ -34,14 +34,30 @@
     cursor: pointer;
     font-family: "Courier New", Courier, monospace;
     position: fixed;
-    left: 38vw;
-    top: 51vh;
+    left: 50vw;
+    top: 55vh;
   }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.9.0/p5.js"></script>
 <script src="./sketch.js"></script>
 <div id="mainSketch">
-  <button class="ResumeBtn">Resume</button>
-  <button class="MainBtn">Projects</button>
-  <body></body>
+  <button id="Resume-Button">Resume</button>
+  <button id="Project-Button">Projects</button>
+  <body>
+    <script>
+      function getCssProperty(elmId, property) {
+        let elem = document.getElementById(elmId);
+        return window.getComputedStyle(elem, null).getPropertyValue(property);
+      }
+      window.onresize = function(event) {
+        let projectButton = document.getElementById("Project-Button");
+        let resumeButton = document.getElementById("Resume-Button");
+        projectButton.style.left = `${window.innerWidth / 2 -
+          projectButton.offsetWidth -
+          10}px`;
+        resumeButton.style.left = `${window.innerWidth / 2 + 10}px`;
+      };
+      window.onresize();
+    </script>
+  </body>
 </div>

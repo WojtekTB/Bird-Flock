@@ -3,6 +3,9 @@ var canvas;
 var asteroids = [];
 var titleImage;
 
+var averageSpeed = 0;
+var averageRotationSpeed = 0;
+
 function preload() {
   titleImage = loadImage("./vadim kim website.png");
 }
@@ -35,7 +38,15 @@ function setup() {
   //   );
   // }
   for (let i = 0; i < 100; i++) {
-    birds.push(new Bird(innerWidth / 2, innerHeight / 2, random(0, 360), 5, 1));
+    birds.push(
+      new Bird(
+        random(0, width),
+        random(0, height),
+        random(0, 360),
+        random(2, 5), //rotation speed
+        random(0.5, 2) //speed
+      )
+    );
   }
 }
 
@@ -44,9 +55,20 @@ function draw() {
   background(0);
   showTitle();
   showDebug();
+  let sumSpeed = 0;
+  let sumRotationSpeed = 0;
   for (let i = 0; i < birds.length; i++) {
-    birds[i].run();
+    let isAlive = birds[i].run();
+    // console.log(isAlive);
+    if (isAlive === false) {
+      birds.splice(i, 1);
+    } else {
+      sumSpeed += birds[i].speed;
+      sumRotationSpeed += birds[i].rotationSpeed;
+    }
   }
+  averageSpeed = sumSpeed / birds.length;
+  averageRotationSpeed = sumRotationSpeed / birds.length;
   for (let i = 0; i < asteroids.length; i++) {
     asteroids[i].run();
   }
@@ -54,13 +76,6 @@ function draw() {
 
 function showTitle() {
   let titleScale = 0.5;
-  // image(
-  //   titleImage,
-  //   width / 2 - (titleImage.width * titleScale) / 2,
-  //   height * (2 / 5) - titleImage.height * titleScale,
-  //   titleImage.width * titleScale,
-  //   titleImage.height * titleScale
-  // );
   image(
     titleImage,
     width / 2 - (titleImage.width * titleScale) / 2,
@@ -74,6 +89,12 @@ function showDebug() {
   fill(255);
   noStroke();
   text(`Number of ships: ${birds.length}`, 10, 20);
+  text(`Average ship speed: ${averageSpeed.toFixed(2)}`, 10, 40);
+  text(
+    `Average ship turning speed: ${averageRotationSpeed.toFixed(2)}`,
+    10,
+    60
+  );
 }
 
 function getDistance(x1, y1, x2, y2) {
@@ -158,49 +179,60 @@ class Bird {
     this.vy = 0;
     this.rotationSpeed = rotationSpeed_;
     this.speed = speed_;
+    this.alive = true;
   }
 
   run() {
-    this.rotateTowards(this.rotationSpeed, mouseX, mouseY);
-    for (let i = 0; i < birds.length; i++) {
-      this.rotateFrom(this.rotationSpeed / 2, 50, birds[i].x, birds[i].y);
-      birds[i].rotateFrom(birds[i].rotationSpeed / 2, 50, this.x, this.y);
+    if (this.alive) {
+      this.rotateTowards(this.rotationSpeed, mouseX, mouseY);
+      for (let i = 0; i < birds.length; i++) {
+        this.rotateFrom(this.rotationSpeed / 2, 50, birds[i].x, birds[i].y);
+        birds[i].rotateFrom(birds[i].rotationSpeed / 2, 50, this.x, this.y);
+      }
+      for (let i = 0; i < asteroids.length; i++) {
+        let distance = this.rotateFrom(
+          this.rotationSpeed * 4,
+          // 0,
+          100,
+          asteroids[i].x,
+          asteroids[i].y
+        );
+        if (distance < asteroids[i].overallSize * 10) {
+          this.alive = false;
+        }
+      }
+      this.calcAcceleration(this.speed);
+      this.move();
+      this.render();
+      return true;
     }
-    for (let i = 0; i < asteroids.length; i++) {
-      let distance = this.rotateFrom(
-        this.rotationSpeed * 4,
-        100,
-        asteroids[i].x,
-        asteroids[i].y
-      );
-    }
-    this.calcAcceleration(this.speed);
-    this.move();
-    this.render();
+    return false;
   }
 
   render() {
     // canvas.x = 0;
     // canvas.y = 0;
-    const placeholderAngle = this.angle;
-    const placeholderX = this.x;
-    const placeholderY = this.y;
-    translate(placeholderX, placeholderY);
-    rotate(-placeholderAngle);
-    // drawGradient(0, 0, 50);
-    let size = 4;
-    noFill();
-    stroke(255);
-    // let birdBody = triangle(size * 2, 0, -size, -size, -size, +size);
-    beginShape();
-    vertex(size * 2, 0);
-    vertex(-size, -size);
-    vertex(0, 0);
-    vertex(-size, +size);
-    vertex(size * 2, 0);
-    endShape();
-    rotate(placeholderAngle);
-    translate(-placeholderX, -placeholderY);
+    if (this.alive) {
+      const placeholderAngle = this.angle;
+      const placeholderX = this.x;
+      const placeholderY = this.y;
+      translate(placeholderX, placeholderY);
+      rotate(-placeholderAngle);
+      // drawGradient(0, 0, 50);
+      let size = 4;
+      noFill();
+      stroke(255);
+      // let birdBody = triangle(size * 2, 0, -size, -size, -size, +size);
+      beginShape();
+      vertex(size * 2, 0);
+      vertex(-size, -size);
+      vertex(0, 0);
+      vertex(-size, +size);
+      vertex(size * 2, 0);
+      endShape();
+      rotate(placeholderAngle);
+      translate(-placeholderX, -placeholderY);
+    }
   }
 
   rotateFrom(rateOfChange_, distanceOfRepultion_, x, y) {
