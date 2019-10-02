@@ -6,6 +6,12 @@ var titleImage;
 var averageSpeed = 0;
 var averageRotationSpeed = 0;
 
+var averageSpeedLog = [];
+var averageRotationSpeedLog = [];
+
+var speedGraph;
+var rotationGraph;
+
 function preload() {
   titleImage = loadImage("./vadim kim website.png");
 }
@@ -24,19 +30,6 @@ function setup() {
       )
     );
   }
-  // asteroid = new Asteroid(100, 100, random(-1, 1), random(-1, 1));
-  // background(0);
-  // for (let i = 0; i < 100; i++) {
-  //   birds.push(
-  //     new Bird(
-  //       random(0, innerWidth),
-  //       random(0, innerHeight),
-  //       random(0, 360),
-  //       random(0.01, 5),
-  //       random(0.5, 1.5)
-  //     )
-  //   );
-  // }
   for (let i = 0; i < 100; i++) {
     birds.push(
       new Bird(
@@ -48,13 +41,17 @@ function setup() {
       )
     );
   }
+  speedGraph = new drawGraph("#FF0000", 2, 230, 0.5, 2);
+  rotationGraph = new drawGraph("#0000ff", 2, 230, 2, 5);
 }
 
 function draw() {
   resizeCanvas(innerWidth, innerHeight);
   background(0);
   showTitle();
-  showDebug();
+  if (document.getElementById("statsForNerds").checked) {
+    showDebug();
+  }
   let sumSpeed = 0;
   let sumRotationSpeed = 0;
   for (let i = 0; i < birds.length; i++) {
@@ -62,6 +59,9 @@ function draw() {
     // console.log(isAlive);
     if (isAlive === false) {
       birds.splice(i, 1);
+      averageRotationSpeedLog.push(averageRotationSpeed);
+      averageSpeedLog.push(averageSpeed);
+      // console.log(averageSpeedLog.length);
     } else {
       sumSpeed += birds[i].speed;
       sumRotationSpeed += birds[i].rotationSpeed;
@@ -71,6 +71,48 @@ function draw() {
   averageRotationSpeed = sumRotationSpeed / birds.length;
   for (let i = 0; i < asteroids.length; i++) {
     asteroids[i].run();
+  }
+}
+
+class drawGraph {
+  constructor(strokeColor, x, y, minPos, maxPos) {
+    this.x = x;
+    this.y = y;
+    this.min = 0;
+    this.max = 0;
+    this.strokeColor = strokeColor;
+    this.minPos = minPos;
+    this.maxPos = maxPos;
+  }
+
+  show(points, yoffset) {
+    let graphWidth = 200;
+    let graphHeight = 150;
+    noFill();
+    stroke(255);
+    rect(this.x, this.y + yoffset, graphWidth, -graphHeight);
+    beginShape();
+    stroke(this.strokeColor);
+    for (let i = 0; i < points.length; i++) {
+      if (this.min > points[i]) {
+        this.min = points[i];
+      }
+      if (this.max < points[i]) {
+        this.max = points[i] * 80;
+      }
+      let yOffset = graphHeight / 2 / this.max;
+      curveVertex(
+        i * (graphWidth / points.length) + this.x,
+        -map(points[i], this.minPos, this.maxPos, 10, graphHeight) +
+          this.y +
+          yOffset
+      );
+    }
+    endShape();
+    fill(0, 0, 255);
+    text(`Rotation`, this.x, this.y + 10 + yoffset);
+    fill(255, 0, 0);
+    text(`Speed`, this.x + "Rotation".length * 12, this.y + 10 + yoffset);
   }
 }
 
@@ -86,15 +128,20 @@ function showTitle() {
 }
 
 function showDebug() {
+  let yoffset = 20;
   fill(255);
   noStroke();
-  text(`Number of ships: ${birds.length}`, 10, 20);
-  text(`Average ship speed: ${averageSpeed.toFixed(2)}`, 10, 40);
+  text(`Number of ships: ${birds.length}`, 10, 20 + yoffset);
+  // fill(255, 0, 0);
+  text(`Average ship speed: ${averageSpeed.toFixed(2)}`, 10, 40 + yoffset);
+  // fill(0, 0, 255);
   text(
     `Average ship turning speed: ${averageRotationSpeed.toFixed(2)}`,
     10,
-    60
+    60 + yoffset
   );
+  speedGraph.show(averageSpeedLog, yoffset);
+  rotationGraph.show(averageRotationSpeedLog, yoffset);
 }
 
 function getDistance(x1, y1, x2, y2) {

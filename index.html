@@ -1,5 +1,10 @@
 <!DOCTYPE html>
 <style>
+  #statsCheck {
+    position: fixed;
+    left: 5px;
+    top: 5px;
+  }
   #mainSketch {
     position: fixed;
     left: 0px;
@@ -43,6 +48,18 @@
 <div id="mainSketch">
   <button id="Resume-Button">Resume</button>
   <button id="Project-Button">Projects</button>
+  <div id="statsCheck">
+    <input type="checkbox" id="statsForNerds" unchecked />
+    <label
+      for="scales"
+      style="color: aliceblue;
+    font-size: 14px;
+    text-decoration: none;
+    font-family: 'Courier New', Courier, monospace"
+      >Cool Stats</label
+    >
+  </div>
+
   <body>
     <script>
       function getCssProperty(elmId, property) {
