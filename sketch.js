@@ -12,6 +12,9 @@ var averageRotationSpeedLog = [];
 var speedGraph;
 var rotationGraph;
 
+var statsShow = false;
+var trailing = 255;
+
 function preload() {
   titleImage = loadImage("./vadim kim website.png");
 }
@@ -46,22 +49,19 @@ function setup() {
 }
 
 function draw() {
-  resizeCanvas(innerWidth, innerHeight);
-  background(0);
-  showTitle();
-  if (document.getElementById("statsForNerds").checked) {
-    showDebug();
+  if (width != innerWidth || height != innerHeight) {
+    resizeCanvas(innerWidth, innerHeight);
   }
+  background(0, 60);
+  // background(0);
   let sumSpeed = 0;
   let sumRotationSpeed = 0;
   for (let i = 0; i < birds.length; i++) {
     let isAlive = birds[i].run();
-    // console.log(isAlive);
     if (isAlive === false) {
       birds.splice(i, 1);
       averageRotationSpeedLog.push(averageRotationSpeed);
       averageSpeedLog.push(averageSpeed);
-      // console.log(averageSpeedLog.length);
     } else {
       sumSpeed += birds[i].speed;
       sumRotationSpeed += birds[i].rotationSpeed;
@@ -72,6 +72,26 @@ function draw() {
   for (let i = 0; i < asteroids.length; i++) {
     asteroids[i].run();
   }
+  showTitle();
+  if (statsShow) {
+    showDebug();
+  }
+}
+
+function mousePressed() {
+  birds.push(
+    new Bird(
+      mouseX,
+      mouseY,
+      random(0, 360),
+      random(2, 5), //rotation speed
+      random(0.5, 2) //speed
+    )
+  );
+}
+
+function StatsCliked() {
+  statsShow = !statsShow;
 }
 
 class drawGraph {
@@ -189,7 +209,8 @@ class Asteroid {
   }
 
   render() {
-    noFill();
+    // noFill();
+    fill(0);
     stroke(255);
     beginShape();
     for (let i = 0; i < this.points.length; i++) {
