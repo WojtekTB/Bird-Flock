@@ -11,6 +11,7 @@
     top: 0px;
   }
   #Resume-Button {
+    width: 10vw;
     background-color: Transparent;
     outline-color: transparent;
     border: 2px solid whitesmoke;
@@ -22,11 +23,9 @@
     margin: 4px 2px;
     cursor: pointer;
     font-family: "Courier New", Courier, monospace;
-    position: fixed;
-    left: 50vw;
-    top: 55vh;
   }
   #Project-Button {
+    width: 10vw;
     background-color: Transparent;
     outline-color: transparent;
     border: 2px solid whitesmoke;
@@ -38,17 +37,40 @@
     margin: 4px 2px;
     cursor: pointer;
     font-family: "Courier New", Courier, monospace;
+  }
+
+  #websiteTitle {
     position: fixed;
-    left: 50vw;
-    top: 55vh;
+    left: 27.5vw;
+    top: 37.5vh;
+    width: 45vw;
+    /* margin: 0px; */
+  }
+  #avatarImage {
+    width: 10vw;
+    margin-top: 0px;
+    transform: translateY(70%);
+    margin: 20px;
+    -webkit-filter: drop-shadow(1px 1px 0 white) drop-shadow(-1px -1px 0 white);
+    filter: drop-shadow(1px 1px 0 white) drop-shadow(-1px -1px 0 white);
+  }
+  #allignmentContainer {
+    position: fixed;
+    left: 33vw;
+    top: 35vh;
+    display: inline-block;
   }
 </style>
 <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.9.0/p5.js"></script> -->
 <script src="./p5/p5.js"></script>
 <script src="./sketch.js"></script>
 <div id="mainSketch">
-  <button id="Resume-Button">Resume</button>
-  <button id="Project-Button">Projects</button>
+  <div id="allignmentContainer">
+    <img id="websiteTitle" src="vadim kim website.png" />
+    <button id="Resume-Button">Resume</button>
+    <img id="avatarImage" src="avatar.png" />
+    <button id="Project-Button">Projects</button>
+  </div>
   <div id="statsCheck">
     <input
       onclick="StatsCliked();"
@@ -64,10 +86,26 @@
     font-family: 'Courier New', Courier, monospace"
       >Cool Stats</label
     >
+    <input
+      type="range"
+      min="1"
+      max="254"
+      value="60"
+      id="slider"
+      onchange="updateTrail();"
+    />
+    <label
+      for="slider"
+      style="color: aliceblue;
+    font-size: 14px;
+    text-decoration: none;
+    font-family: 'Courier New', Courier, monospace"
+      >Trails</label
+    >
   </div>
 
   <body>
-    <script>
+    <!-- <script>
       function getCssProperty(elmId, property) {
         let elem = document.getElementById(elmId);
         return window.getComputedStyle(elem, null).getPropertyValue(property);
@@ -81,6 +119,6 @@
         resumeButton.style.left = `${window.innerWidth / 2 + 10}px`;
       };
       window.onresize();
-    </script>
+    </script> -->
   </body>
 </div>
