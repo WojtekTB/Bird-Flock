@@ -30,7 +30,7 @@ function setup() {
   lazerGrid = new Grid(lazerGridScale);
   lazerGrid.populate(innerWidth, innerHeight);
 
-  for (let i = 0; i < 1; i++) {
+  for (let i = 0; i < 20; i++) {
     ships.push(
       new ship(
         random(0, innerWidth),
