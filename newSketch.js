@@ -18,6 +18,7 @@ var shipSpeed = {
   min: 0.05,
   max: 0.2
 };
+var debug = true;
 
 function setup() {
   /* creating a canvas and attatching it to a div */
@@ -29,7 +30,7 @@ function setup() {
   lazerGrid = new Grid(lazerGridScale);
   lazerGrid.populate(innerWidth, innerHeight);
 
-  for (let i = 0; i < 2; i++) {
+  for (let i = 0; i < 1; i++) {
     ships.push(
       new ship(
         random(0, innerWidth),
@@ -38,7 +39,7 @@ function setup() {
         random(3, 6),
         random(shipSpeed.min, shipSpeed.max),
         random(1, 5),
-        100,
+        10,
         10,
         screenGrid,
         lazerGrid,
@@ -68,12 +69,10 @@ function setup() {
 
 function draw() {
   background(0);
-  screenGrid.clean();
-  lazerGrid.clean();
   mainBossShip.showHealthBar();
   for (let i = 0; i < lazers.length; i++) {
     if (lazers[i].delete == true) {
-      lazers.splice(i, 1);
+      lazers.splice(i, 1); //should be fine because you remove it from the grid when you set the delete boolean
       //   console.log("reee");
     } else {
       lazers[i].show();
@@ -84,28 +83,48 @@ function draw() {
   for (let i = 0; i < ships.length; i++) {
     ships[i].show();
     ships[i].showHealthBar();
+    if (debug) {
+      fill(200, 0, 0, 100);
+      circle(ships[i].x, ships[i].y, hitDetectionLength * ships[i].size);
+    }
     ships[i].run();
-    // ships[i].addVel();
+    ships[i].addVel();
     ships[i].checkGrid();
     ships[i].swarmWithOtherShips();
     ships[i].checkIfShot();
-    fill(200, 0, 0, 100);
-    circle(ships[i].x, ships[i].y, hitDetectionLength * ships[i].size);
+    if (ships[i].dead) {
+      screenGrid.removeQueue.push({
+        x: ships[i].gridX,
+        y: ships[i].gridY,
+        id: ships[i].ID
+      });
+      ships.splice(i, 1);
+      continue;
+    }
+
     // ships[i].rotation++;
   }
   mainBossShip.show();
-  if (frameCount % 20 == 1) {
-  }
-  // lazerDetectionDebugGrid();
-  shipDetectionDebugGrid();
-  if (keyIsDown(LEFT_ARROW)) {
-    ships[0].addRotatio(-3);
-  }
-  if (keyIsDown(RIGHT_ARROW)) {
-    ships[0].addRotatio(3);
-  }
-  if (keyIsDown(UP_ARROW)) {
-    ships[0].addVel();
+
+  screenGrid.clean();
+  lazerGrid.clean();
+
+  //debug stuff
+  if (debug) {
+    // if (frameCount % 20 == 1) {
+    //   ships[Math.floor(random(0, ships.length))].shoot();
+    // }
+    // lazerDetectionDebugGrid();
+    shipDetectionDebugGrid();
+    if (keyIsDown(LEFT_ARROW)) {
+      ships[0].addRotatio(-3);
+    }
+    if (keyIsDown(RIGHT_ARROW)) {
+      ships[0].addRotatio(3);
+    }
+    if (keyIsDown(UP_ARROW)) {
+      ships[0].addVel();
+    }
   }
 }
 
@@ -195,6 +214,7 @@ class Grid {
           this.removeQueue[i].id
         ) {
           this.grid[this.removeQueue[i].y][this.removeQueue[i].x].splice(j, 1);
+          j--;
           // console.log(
           //   `removed at ${this.removeQueue[i].x}, ${this.removeQueue[i].y}`
           // );
@@ -382,6 +402,7 @@ class ship {
     this.attackStrength = AttackStrength;
     this.lazersArray = lazersArray;
     this.opacityOfHealth = 0;
+    this.dead = false;
   }
   show() {
     /* 
@@ -515,21 +536,27 @@ class ship {
   }
 
   hit(lazer) {
-    console.log(
-      `Ship ID${this.ID} has been hit by lazer from ID${lazer.senderID}`
-    );
+    // console.log(
+    //   `Ship ID${this.ID} has been hit by lazer from ID${lazer.senderID}`
+    // );
     this.opacityOfHealth = 255;
+    this.currentHealth -= lazer.damage;
+    if (this.currentHealth <= 0) {
+      this.dead = true;
+      console.log(`Ship ID${this.ID} was killed by Ship ID${lazer.senderID}`);
+    }
   }
 
   showHealthBar() {
     let pixelsPerPoint = 0.2;
     let healthBarX = this.x - (this.maxHealth / 2) * pixelsPerPoint;
     let healthBarY = this.y + this.size * 3;
-    let healthBarW = this.maxHealth * pixelsPerPoint;
+    let maxHealthBarW = this.maxHealth * pixelsPerPoint;
+    let healthBarW = this.currentHealth * pixelsPerPoint;
     let healthBarH = this.size / 2;
     fill(159, 159, 159, this.opacityOfHealth);
     stroke(159, 159, 159, this.opacityOfHealth);
-    rect(healthBarX, healthBarY, healthBarW, healthBarH);
+    rect(healthBarX, healthBarY, maxHealthBarW, healthBarH);
     fill(255, 0, 0, this.opacityOfHealth);
     rect(healthBarX, healthBarY, healthBarW, healthBarH);
   }
@@ -717,7 +744,7 @@ class Lazer {
       this.lazerGrid.removeQueue.push({
         x: this.gridX,
         y: this.gridY,
-        id: this.senderID
+        id: this.ID
       });
     } else {
       this.x += this.vx;
