@@ -14,7 +14,7 @@ var rotationGraph;
 var statsShow = false;
 var trailing = 255;
 
-var trail = 60;
+var trail = 128;
 
 // grid of the field
 var birdGrid;
