@@ -41,7 +41,12 @@ function setup() {
       )
     );
   }
-  for (let i = 0; i < 100; i++) {
+  let numOfBirds = 100;
+  if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
+    // if mobile, half it
+    numOfBirds /= 2;
+  }
+  for (let i = 0; i < numOfBirds; i++) {
     birds.push(
       new Bird(
         random(0, width),

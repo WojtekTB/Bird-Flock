@@ -44,6 +44,16 @@ class Bird {
           );
           if (distance < nearAsteroids[i].killRadius * 0.7) {
             this.alive = false;
+            // spawn a random bird
+            birds.push(
+                new Bird(
+                  random(0, width),
+                  random(0, height),
+                  random(0, 360),
+                  random(2, 5), //rotation speed
+                  random(0.5, 2) //speed
+                )
+              );
           }
         }
   
