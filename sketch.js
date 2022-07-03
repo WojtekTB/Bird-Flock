@@ -52,7 +52,7 @@ function setup() {
       )
     );
   }
-  speedGraph = new drawGraph("#FF0000", 2, 230, 0.5, 2);
+  speedGraph = new drawGraph("#FF0000", 2, 230, 0.9, 3);
   rotationGraph = new drawGraph("#0000ff", 2, 230, 2, 5);
 }
 
@@ -102,6 +102,10 @@ function processGraphs(){
   averageRotationSpeed = sumRotationSpeed / birds.length;
   averageRotationSpeedLog.push(averageRotationSpeed);
   averageSpeedLog.push(averageSpeed);
+  if(averageSpeedLog.length > 100){
+    averageSpeedLog.shift();
+    averageRotationSpeedLog.shift();
+  }
 }
 
 function mousePressed() {

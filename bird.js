@@ -27,7 +27,7 @@ class Bird {
       this.previousGridX = this.getGridX();
       this.previousGridY = this.getGridY();
       if (this.alive) {
-        // this.rotateTowards(this.rotationSpeed, mouseX, mouseY);
+        this.rotateTowards(this.rotationSpeed, mouseX, mouseY);
         // for (let i = 0; i < birds.length; i++) {
         //   this.rotateFrom(this.rotationSpeed / 2, 50, birds[i].x, birds[i].y);
         //   birds[i].rotateFrom(birds[i].rotationSpeed / 2, 50, this.x, this.y);
@@ -42,7 +42,7 @@ class Bird {
             nearAsteroids[i].x,
             nearAsteroids[i].y
           );
-          if (distance < asteroids[i].killRadius) {
+          if (distance < nearAsteroids[i].killRadius * 0.7) {
             this.alive = false;
           }
         }

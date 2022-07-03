@@ -18,18 +18,18 @@ class drawGraph {
       beginShape();
       stroke(this.strokeColor);
       for (let i = 0; i < points.length; i++) {
-        if (this.min > points[i]) {
-          this.min = points[i];
-        }
-        if (this.max < points[i]) {
-          this.max = points[i] * 80;
-        }
-        let yOffset = graphHeight / 2 / this.max;
+        // if (this.min > points[i]) {
+        //   this.min = points[i];
+        // }
+        // if (this.max < points[i]) {
+        //   this.max = points[i] * 80;
+        // }
+        // let yOffset = graphHeight / 2 / this.max;
         curveVertex(
           i * (graphWidth / points.length) + this.x,
           -map(points[i], this.minPos, this.maxPos, 10, graphHeight) +
-            this.y +
-            yOffset
+            this.y 
+            // + yOffset
         );
       }
       endShape();
